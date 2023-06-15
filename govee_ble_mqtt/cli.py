@@ -71,7 +71,9 @@ class Controller:
                     "supported_color_modes": ["color_temp", "rgb"],
                     "unique_id": f"{id}_govee_ble",
                 }
+                _LOGGER.info(f"on_new_device(): Publish discovery payload: {hass_data}")
                 await self._mqtt.publish_json(id, hass_prefix + "/light/{id}/config", hass_data, retain=True)
+            _LOGGER.info(f"on_new_device(): Publish info update: {data}")
             await self._mqtt.publish_json(id, "{topic}/{id}/info", data)
         except Exception:
             _LOGGER.exception(f"on_new_device(): Error while publishing device data")
@@ -80,6 +82,7 @@ class Controller:
         _LOGGER.info(f"on_device_data(): Device manufacturer data update: {device}, {mdata}")
         data = {"state": "ON" if mdata[4] == 0x01 else "OFF"}
         try:
+            _LOGGER.info(f"on_device_data(): Publish status update: {data}")
             await self._mqtt.publish_json(_address_to_id(device.address), "{topic}/{id}/status", data, retain=True)
         except Exception:
             _LOGGER.exception(f"on_device_data(): Error while publishing device status")

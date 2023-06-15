@@ -55,7 +55,7 @@ class MQTTController:
                         await client.subscribe(f"{self._topic}/+/command/+")
                         self._client = client
                         async for message in messages:
-                            _LOGGER.info(f"mqtt_connect(): New message: {message.topic.value}: {message.payload}")
+                            _LOGGER.debug(f"mqtt_connect(): New message: {message.topic.value}: {message.payload}")
                             tparts = message.topic.value.split("/")
                             await self._on_message(tparts[1], tparts[3], message.payload.decode())
                 _LOGGER.info(f"mqtt_connect(): Disconnected from server")
@@ -65,7 +65,7 @@ class MQTTController:
 
     async def publish_json(self, id: str, topic_tmpl: str, data: dict, retain: bool=False):
         if self._client:
-            _LOGGER.info(f"mqtt_publish_json(): {topic_tmpl}: {data}")
+            _LOGGER.debug(f"mqtt_publish_json(): {topic_tmpl}: {data}")
             await self._client.publish(self.build_topic(topic_tmpl, id), json.dumps(data), retain=retain)
         else:
             _LOGGER.warn(f"mqtt_publish_json(): No active MQTT connection")

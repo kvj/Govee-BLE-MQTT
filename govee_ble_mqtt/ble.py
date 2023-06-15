@@ -36,9 +36,11 @@ class BLEController:
         async def on_notify(client, data):
             _LOGGER.debug(f"on_notify(): {data}")
         cached = self._device_cache.get(address)
+        if cached:
+            cached[1].manufacturer_data[GOVEE_MDATA] = ()
         async with BleakClient(cached[0] if cached else address) as client:
             await client.start_notify(GOVEE_READ_CHAR, on_notify)
-            _LOGGER.info(f"send_commands() sending [{len(commands)}] to {address}")
+            _LOGGER.info(f"send_commands(): Sending commands to {address} [{len(commands)}]")
             for cmd in commands:
                 await client.write_gatt_char(GOVEE_WRITE_CHAR, cmd)
                 _LOGGER.debug(f"send_commands(): Wrote cmd: {cmd}")
@@ -69,7 +71,6 @@ class BLEController:
                         await self._on_device_update(device, mdata)
 
         self._discovery_event = asyncio.Event()
-        self._device_cache = {}
         async with BleakScanner(callback):
             _LOGGER.info(f"start_discovery(): Discovery has started")
             await self._discovery_event.wait()
