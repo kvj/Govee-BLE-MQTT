@@ -20,8 +20,9 @@ class BLEController:
         self._device_allow_list = []
         for addr in config["device"]:
             self._device_allow_list.append(addr.upper())
-
-        self._device_cache = dict()
+        if len(self._device_allow_list):
+            _LOGGER.info(f"__init__(): Using fixed list of devices: {self._device_allow_list}")
+        self._device_cache = {}
 
     def set_on_new_device(self, handler):
         self._on_new_device = handler
@@ -68,7 +69,8 @@ class BLEController:
                         await self._on_device_update(device, mdata)
 
         self._discovery_event = asyncio.Event()
-        async with BleakScanner(callback) as scanner:
+        self._device_cache = {}
+        async with BleakScanner(callback):
             _LOGGER.info(f"start_discovery(): Discovery has started")
             await self._discovery_event.wait()
             self._discovery_event = None
