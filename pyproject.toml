@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "govee-ble-mqtt"
+version = "0.0.1"
+description = "Govee BLE Lights MQTT gateway"
+dependencies = [
+    "rich",
+    "bleak",
+    "click",
+    "paho-mqtt",
+    "asyncio-mqtt",
+]
+
+[project.scripts]
+govee-ble-mqtt = "govee_ble_mqtt.cli:cli"
